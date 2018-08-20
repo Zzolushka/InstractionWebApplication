@@ -1,0 +1,28 @@
+﻿@model IEnumerable<InstructionsWebApplication.Models.Instruction>
+
+@{
+    ViewData["Title"] = "ShowAllInstruction";
+}
+
+<h2>ShowAllInstruction</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+@foreach (var item in Model)
+{
+    <div class="row">
+        <div class="col-sm-6 col-md-4">
+            <div class="thumbnail">
+                <img src="@item.ImageURL" alt="...">
+                <div class="caption">
+                    <h3>Thumbnail label</h3>
+                    <p>@item.Description</p>
+                    <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
