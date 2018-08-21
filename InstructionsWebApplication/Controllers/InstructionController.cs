@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Korzh.EasyQuery.Linq;
 
 namespace InstructionsWebApplication.Controllers
 {
@@ -119,6 +120,40 @@ namespace InstructionsWebApplication.Controllers
             var instructions = _db.Instructions.Include(c => c.User).Where(c => c.User == user);
             return View(instructions.ToList());
         }
+
+        public ActionResult AddPage(string id)
+        {
+            Instruction currentInstruction = _db.Instructions.SingleOrDefault(i=>i.InstructionId == id);
+            _db.Pages.Add(new Page { Instruction = currentInstruction,Text = "",ImageURL = ""});
+            return RedirectToAction("EditPage");
+        }
+
+        [HttpGet]
+        public ActionResult EditPage(string InstructionId,string id)
+        {
+            //Instruction currentInstruction = _db.Instructions.SingleOrDefault(i => i.InstructionId == id);
+            //Page page =
+
+            return PartialView();
+        }
+
+        [HttpPost]
+        public ActionResult EditPage(string InstructionId, string id,IFormCollection collection)
+        {
+
+            return View();
+        }
+
+        public IActionResult ShowUserInstruction()
+        {
+            return View();
+        }
+
+        
+
+
+
+
 
 
 
