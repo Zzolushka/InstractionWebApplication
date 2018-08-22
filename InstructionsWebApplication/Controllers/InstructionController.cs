@@ -65,30 +65,19 @@ namespace InstructionsWebApplication.Controllers
             }
         }
 
-
-
         // GET: Instruction/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(string InstructionId)
         {
-            return View();
+            var currentInstruction = _db.Instructions.SingleOrDefault(i=>i.InstructionId == InstructionId);
+            var currentPages = _db.Pages.Include(p=>p.Instruction).Where(p=>p.Instruction == currentInstruction);
+            ViewBag.InstructionId = InstructionId;
+           
+            return View(currentPages);
+          
         }
 
         // POST: Instruction/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add update logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+      
 
         // GET: Instruction/Delete/5
         public ActionResult Delete(int id)
@@ -121,33 +110,38 @@ namespace InstructionsWebApplication.Controllers
             return View(instructions.ToList());
         }
 
-        public ActionResult AddPage(string id)
+        public ActionResult AddPage(string InstructionId)
         {
-            Instruction currentInstruction = _db.Instructions.SingleOrDefault(i=>i.InstructionId == id);
-            _db.Pages.Add(new Page { Instruction = currentInstruction,Text = "",ImageURL = ""});
-            return RedirectToAction("EditPage");
+            Instruction currentInstruction = _db.Instructions.SingleOrDefault(i=>i.InstructionId == InstructionId);
+            _db.Pages.Add(new Page { Instruction = currentInstruction,Text = "",ImageURL = "http://www.clipartbest.com/cliparts/aiq/x7q/aiqx7qXAT.jpg" });
+            _db.SaveChanges();
+            return RedirectToAction("Edit","Instruction", new {InstructionId = InstructionId});
         }
 
-        [HttpGet]
-        public ActionResult EditPage(string InstructionId,string id)
+        
+        public ActionResult EditPage(string InstructionId,string PageId)
         {
-            //Instruction currentInstruction = _db.Instructions.SingleOrDefault(i => i.InstructionId == id);
-            //Page page =
-
-            return PartialView();
+            var currentPage = _db.Pages.SingleOrDefault(p=>p.PageId == PageId);
+            return View(currentPage);
         }
 
         [HttpPost]
-        public ActionResult EditPage(string InstructionId, string id,IFormCollection collection)
+        //[ValidateAntiForgeryToken]
+        public ActionResult EditPage(string InstructionId, string PageId, IFormCollection collection)
         {
-
-            return View();
+            var currentPage = _db.Pages.SingleOrDefault(p => p.PageId == PageId);
+            currentPage.Text = collection["Text"];
+            currentPage.ImageURL = collection["ImageURL"];
+            _db.SaveChanges();
+            return RedirectToAction("Edit", "Instruction", new { InstructionId = InstructionId });
         }
 
         public IActionResult ShowUserInstruction()
         {
             return View();
         }
+
+
 
         
 

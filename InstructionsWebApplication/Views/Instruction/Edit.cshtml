@@ -1,0 +1,29 @@
+﻿@model IEnumerable<InstructionsWebApplication.Models.Page>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+
+    @foreach (var item in Model)
+    {
+    <div class="row">
+        <div class="col-sm-6 col-md-4">
+            <div class="thumbnail">
+                <img src="@item.ImageURL" alt="...">
+                <div class="caption">
+                    <h3>Thumbnail label</h3>
+                    <p>@item.Text</p>
+                    <p>@Html.ActionLink("Redact", "EditPage", "Instruction", new { InstructionId = ViewBag.InstructionId, PageId = item.PageId })</p>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    }
+
+
+    <div>
+       @Html.ActionLink("AddPage", "AddPage", "Instruction", new { InstructionId = ViewBag.InstructionId })
+    </div>
