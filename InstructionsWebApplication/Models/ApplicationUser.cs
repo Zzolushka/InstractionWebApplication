@@ -10,5 +10,6 @@ namespace InstructionsWebApplication.Models
     public class ApplicationUser : IdentityUser
     {
          public virtual ICollection<Instruction> Instructions { get; set; }
+      
     }
 }

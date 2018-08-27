@@ -9,12 +9,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Korzh.EasyQuery.Linq;
+using InstructionsWebApplication.Models.InstructionViewModels;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 
 namespace InstructionsWebApplication.Controllers
 {
+
     public class InstructionController : Controller
     {
-
         private ApplicationDbContext _db;
 
         private UserManager<ApplicationUser> _userManager;
@@ -35,11 +38,13 @@ namespace InstructionsWebApplication.Controllers
         // GET: Instruction/Details/5
         public ActionResult Details(int id)
         {
+
             return View();
         }
 
         // GET: Instruction/Create
-        public ActionResult Create()
+        [HttpGet]
+        public ActionResult Create(string UserId)
         {
             return View();
         }
@@ -47,17 +52,16 @@ namespace InstructionsWebApplication.Controllers
         // POST: Instruction/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(string UserId, IFormCollection collection)
         {
             try
             {
-                var userId = _userManager.GetUserId(HttpContext.User);
-                var user = _userManager.Users.SingleOrDefault(u => u.Id == userId);
-                // TODO: Add insert logic here
-                _db.Instructions.Add(new Instruction { Tags = collection["Tags"],Description = collection["Description"], User = user, Pages = new List<Page>() ,ImageURL = "http://s1.1zoom.me/b5050/137/371625-svetik_1440x900.jpg" });
+                
+                _userManager.Users.Include(u=>u.Instructions).SingleOrDefault(u => u.Id == UserId).Instructions.Add(new Instruction { Tags = collection["Tags"], Description = collection["Description"], ImageURL = collection["ImageURL"],Category = collection["Category"],Name = collection["Name"] });
+                
                 _db.SaveChanges();
 
-                return RedirectToAction("ShowAllInstruction");
+                return RedirectToAction("showuserinformation", "home", new { UserId = UserId });
             }
             catch
             {
@@ -65,55 +69,26 @@ namespace InstructionsWebApplication.Controllers
             }
         }
 
-        // GET: Instruction/Edit/5
         public ActionResult Edit(string InstructionId)
-        {
-            var currentInstruction = _db.Instructions.SingleOrDefault(i=>i.InstructionId == InstructionId);
-            var currentPages = _db.Pages.Include(p=>p.Instruction).Where(p=>p.Instruction == currentInstruction);
+        { 
+            var instruction = _db.Instructions.Include(i => i.Pages).Include(i => i.Comments).SingleOrDefault(i => i.InstructionId == InstructionId);
             ViewBag.InstructionId = InstructionId;
-           
-            return View(currentPages);
-          
+            ViewBag.InstructionName = instruction.Name;
+            return View(instruction.Pages);
         }
 
-        // POST: Instruction/Edit/5
-      
-
-        // GET: Instruction/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete(string UserId,string InstructionId)
         {
-            return View();
-        }
+            var instruction = _db.Instructions.Include(i=>i.Pages).Include(i=>i.Comments).SingleOrDefault(i=>i.InstructionId == InstructionId);
+            _db.Instructions.Remove(instruction);
 
-        // POST: Instruction/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch                                                                                            
-            {
-                return View();
-            }
-        }
-
-        public ActionResult ShowAllInstruction()
-        {
-            var userId = _userManager.GetUserId(HttpContext.User);
-            var user = _userManager.Users.SingleOrDefault(u => u.Id == userId);
-            var instructions = _db.Instructions.Include(c => c.User).Where(c => c.User == user);
-            return View(instructions.ToList());
+            _db.SaveChanges();
+            return  RedirectToAction("showuserinformation","home",new { UserId = UserId});
         }
 
         public ActionResult AddPage(string InstructionId)
         {
-            Instruction currentInstruction = _db.Instructions.SingleOrDefault(i=>i.InstructionId == InstructionId);
-            _db.Pages.Add(new Page { Instruction = currentInstruction,Text = "",ImageURL = "http://www.clipartbest.com/cliparts/aiq/x7q/aiqx7qXAT.jpg" });
+            _db.Instructions.Include(i => i.Pages).Include(i => i.Comments).SingleOrDefault(i => i.InstructionId == InstructionId).Pages.Add(new Page { Text = "", ImageURL = "http://www.clipartbest.com/cliparts/aiq/x7q/aiqx7qXAT.jpg" });
             _db.SaveChanges();
             return RedirectToAction("Edit","Instruction", new {InstructionId = InstructionId});
         }
@@ -121,29 +96,75 @@ namespace InstructionsWebApplication.Controllers
         
         public ActionResult EditPage(string InstructionId,string PageId)
         {
-            var currentPage = _db.Pages.SingleOrDefault(p=>p.PageId == PageId);
-            return View(currentPage);
+            var page = _db.Pages.SingleOrDefault(p=>p.PageId == PageId);
+            ViewBag.PageId = PageId;
+            return View(page);
         }
 
         [HttpPost]
         //[ValidateAntiForgeryToken]
-        public ActionResult EditPage(string InstructionId, string PageId, IFormCollection collection)
+        public ActionResult EditPage(string InstructionId, string PageId, string ImageURL,  IFormCollection collection)
         {
-            var currentPage = _db.Pages.SingleOrDefault(p => p.PageId == PageId);
-            currentPage.Text = collection["Text"];
-            currentPage.ImageURL = collection["ImageURL"];
+
+            var page = _db.Pages.SingleOrDefault(p => p.PageId == PageId);
+            page.Text = collection["Text"];
+            page.ImageURL = collection["ImageURL"];
+
             _db.SaveChanges();
             return RedirectToAction("Edit", "Instruction", new { InstructionId = InstructionId });
         }
 
-        public IActionResult ShowUserInstruction()
+        public ActionResult ShowInstruction(string InstructionId)
         {
-            return View();
+            var currentInstruction = _db.Instructions.Include(i=>i.Pages).Include(i => i.Comments).SingleOrDefault(i=>i.InstructionId ==InstructionId);
+
+            var UserId = _userManager.GetUserId(User);
+            var UserName = _userManager.GetUserName(User);
+
+            ViewBag.InstructionId = InstructionId;
+
+            ViewBag.UserId = UserId;
+
+            ViewBag.UserName = UserName;
+
+            ViewBag.InstructionName = currentInstruction.Name;
+
+
+            var model = new ShowInstructionModel()
+            {
+                Pages = currentInstruction.Pages,
+                Comments = currentInstruction.Comments
+            };
+
+            return View(model);
         }
 
 
 
-        
+
+
+
+
+
+
+
+
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

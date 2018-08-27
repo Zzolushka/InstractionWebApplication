@@ -1,33 +1,61 @@
 ﻿@model InstructionsWebApplication.Models.Page
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
-<h4>Page</h4>
+<h4> @Localizer["EditPage"]</h4>
 <hr />
 
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.10.0/js/bootstrap-markdown.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.10.0/css/bootstrap-markdown.min.css" rel="stylesheet" />
+
 <div class="row">
-    <div class="col-md-4">
-        <form  method="post">
+    <div class="col-md-12">
+        <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-          
+
             <div class="form-group">
-                <label asp-for="Text" class="control-label"></label>
-                <input asp-for="Text" class="form-control" />
+                @*<label asp-for="Text" class="control-label"></label>*@
+                @Localizer["Text"]
+                <textarea asp-for="Text" class="form-control" id="text" data-provide="markdown"></textarea>
                 <span asp-validation-for="Text" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ImageURL" class="control-label"></label>
-                <input asp-for="ImageURL" class="form-control" />
+
+            
+            <a href="#" id="upload_widget_opener">@Localizer["UploadImage"].Value</a>
+            <div class="form-group" hidden="hidden">
+                @* <label asp-for="ImageURL" class="control-label"></label>*@
+
+                <input asp-for="ImageURL" class="form-control" id="ImageURL" hidden="hidden" />
                 <span asp-validation-for="ImageURL" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
-            </div>
+            <p>
+                <div class="form-group">
+                    <input type="submit" value="@Localizer["Save"].Value" class="btn btn-default" />
+                </div>
+            </p>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+
+<script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
+<script type="text/javascript">
+    cloudinary.applyUploadWidget('#upload_widget_opener', {
+        cloudName: 'djrk897te', uploadPreset: 'uomwsjzr',
+        cropping: 'server', folder: 'widgetdocs'
+    }, (error, result) => {
+        if (result.event === "success") {
+            $("#ImageURL").val(result.info.secure_url);
+        }
+    });
+
+
+</script>
+
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

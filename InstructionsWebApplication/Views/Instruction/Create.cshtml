@@ -3,46 +3,79 @@
 @{
     ViewData["Title"] = "Create";
 }
-
+@using Microsoft.AspNetCore.Mvc.Localization
+    @inject IViewLocalizer Localizer
 <h2>Create</h2>
 
-<h4>Instruction</h4>
+<h4> @Localizer["Instruction"]</h4>
 <hr />
 <form method="post">
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-          
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
+    <div class="row">
+        <div class="col-md-12">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            <div class="form-group">
-                <label asp-for="ImageURL" class="control-label"></label>
-                <input asp-for="ImageURL" class="form-control" />
-                <span asp-validation-for="ImageURL" class="text-danger"></span>
-            </div>
+                <div class="form-group">
+                    @Localizer["Name"]
+                    <input asp-for="Name" class="form-control" id="Name" />
+                </div>
 
-            <div class="form-group">
-                <label asp-for="Tags" class="control-label"></label>
-                <input asp-for="Tags" class="form-control" />
-                <span asp-validation-for="Tags" class="text-danger"></span>
-            </div>
+                <div class="form-group">
+                    @* <label asp-for="Description" class="control-label"></label>*@
+                    @Localizer["Description"]
+                    <textarea asp-for="Description" class="form-control" rows="12"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
 
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
-        </form>
+                <a href="#" id="upload_widget_opener">@Localizer["UploadImage"]</a>
+
+                <p>
+                    <div class="form-group" hidden="hidden">
+                     @*   <label asp-for="ImageURL" class="control-label"></label>*@
+                       
+                        <input asp-for="ImageURL" class="form-control" id="ImageURL" hidden="hidden" />
+                        <span asp-validation-for="ImageURL" class="text-danger"></span>
+                    </div>
+                </p>
+
+                    <div>
+                        <select asp-for="Category" class="form-control" id="select">
+                            @await Html.PartialAsync("_TopicsInstructions")
+                        </select>
+                    </div>
+
+                    <div class="form-group" hidden="hidden">
+                        <label asp-for="Tags" class="control-label"></label>
+                        <input asp-for="Tags" class="form-control" />
+                        <span asp-validation-for="Tags" class="text-danger"></span>
+                    </div>
+                <p>
+                    <div class="form-group">
+                        <input type="submit" value="Create" class="btn btn-default" />
+                    </div>
+                </p>
+            </form>
+        </div>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+   
+
+
 </form>
+
+<script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
+<script type="text/javascript">
+    cloudinary.applyUploadWidget('#upload_widget_opener', {
+        cloudName: 'djrk897te', uploadPreset: 'uomwsjzr',
+        cropping: 'server', folder: 'widgetdocs'
+    }, (error, result) => {
+        if (result.event === "success") {
+            $("#ImageURL").val(result.info.secure_url);
+
+        }
+    });
+</script>
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

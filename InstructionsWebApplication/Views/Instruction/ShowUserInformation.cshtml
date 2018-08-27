@@ -1,11 +1,16 @@
 ﻿@model IEnumerable<InstructionsWebApplication.Models.Instruction>
 
+
 @{
     ViewData["Title"] = "ShowAllInstruction";
 }
+
+<div class="jumbotron">
+    <h1 class="text-center">@ViewBag.UserName</h1>
+</div>
    
 <div>
-@Html.ActionLink("Add", "Create", "Instruction",new { } ,new { @class = "btn btn-success" })
+@Html.ActionLink("Add", "Create", "Instruction",new {ViewBag.UserId } ,new { @class = "btn btn-success" })
 </div>   
     @foreach (var item in Model)
     {   <div class="row">
@@ -14,12 +19,12 @@
                     <img src="@item.ImageURL" alt="...">
                     <div class="caption">
                         <h3></h3>
-                        <blockquote>
+                        <div class="well">
                         <p>@item.Description</p>
-                        </blockquote>
+                        </div>
                         <p>@Html.ActionLink("Edit", "Edit", "Instruction", new { InstructionId = item.InstructionId }, new { @class = "btn btn-primary" })
                         @Html.ActionLink("Delete", "Delete", "Instruction", new { InstructionId = item.InstructionId }, new { @class = "btn btn-danger" ,role = "button"})
-                        @Html.ActionLink("Open", "Show", "Instruction", new { InstructionId = item.InstructionId }, new { @class = "btn btn-success pull-right", role = "button" })</p>
+                        @Html.ActionLink("Open", "ShowInstruction", "Instruction", new { InstructionId = item.InstructionId }, new { @class = "btn btn-success pull-right", role = "button" })</p>
                     </div>
                 </div>
             </div>

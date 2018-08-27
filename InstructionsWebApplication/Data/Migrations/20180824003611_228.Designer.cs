@@ -11,9 +11,10 @@ using System;
 namespace InstructionsWebApplication.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180824003611_228")]
+    partial class _228
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,15 +81,13 @@ namespace InstructionsWebApplication.Data.Migrations
 
                     b.Property<string>("Text");
 
-                    b.Property<string>("UserName");
-
                     b.Property<string>("UserURL");
 
                     b.HasKey("CommentId");
 
                     b.HasIndex("InstructionId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comment");
                 });
 
             modelBuilder.Entity("InstructionsWebApplication.Models.Instruction", b =>
@@ -102,11 +101,7 @@ namespace InstructionsWebApplication.Data.Migrations
 
                     b.Property<string>("ImageURL");
 
-                    b.Property<string>("Name");
-
                     b.Property<string>("Tags");
-
-                    b.Property<string>("UpdateTime");
 
                     b.Property<string>("UserId");
 

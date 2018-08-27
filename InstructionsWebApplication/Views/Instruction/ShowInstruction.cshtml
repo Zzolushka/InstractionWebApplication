@@ -1,0 +1,123 @@
+﻿@model InstructionsWebApplication.Models.InstructionViewModels.ShowInstructionModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    int count = 0;
+}
+<div class="jumbotron form-group">
+    <h1 class="text-center"> @ViewBag.InstructionName</h1>
+</div>
+@{
+    var markdown = new MarkdownSharp.Markdown();
+}
+@foreach (var item in Model.Pages)
+{
+
+    count++;
+
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xs-12">
+            <div class="thumbnail">
+
+                <div class="caption">
+                    <h3 class="h3 text-center">@Localizer["Step"] @count</h3>
+
+
+                    @{
+                        string text = markdown.Transform(item.Text);
+                    }
+
+                    <img src="@item.ImageURL" class="img-responsive">
+                    <p>
+                        <div class="well">
+
+                            gaf
+                            @Html.Raw(text)
+
+                        </div>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+<hr>
+
+<div class="input-group">
+    <span class="input-group-addon">+</span>
+    <input class="form-group form-control" id="CommentEdit" placeholder="@Localizer["CommentText"]">
+    <span class="input-group-btn">
+        <input class="btn btn-success" type="submit" value="@Localizer["Add"]" id="ButtonAddComment" />
+    </span>
+</div>
+
+<p>
+</p>
+@foreach (var item in Model.Comments)
+{
+
+
+    @*<blockquote>
+            <p>@item.Text</p>
+            <small><a href="@item.UserURL">user</a></small>
+        </blockquote>*@
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title"><a href="@item.UserURL">@item.UserName</a></h3>
+        </div>
+        <div class="panel-body">
+            @item.Text
+        </div>
+    </div>
+
+}
+
+<div id="comments">
+
+</div>
+
+@*@Html.ActionLink("Add", "AddComment", "Instruction", new { InstructionId = ViewBag.InstructionId })*@
+
+
+@*<div>
+        <input class="form-group" id="CommentEdit">
+    </div>
+
+    <div>
+        <button id="ButtonAddComment">Добавить Комментарий</button>
+    </div>*@
+
+
+
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/lib/signalr/signalr.js"></script>
+
+
+<script>
+        var connection = new signalR.HubConnectionBuilder().withUrl("/CommentHub").build();
+
+        connection.start().catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        WriteToPage = function (message, userurl, username) {
+            $("#comments").append("<div class='panel panel-primary'><div class='panel-heading'><h3 class='panel-title'><a href='" + userurl + "'>" + username +"</a></div><div class='panel-body'>" + message + "</div ></div >");
+            //$(".inner").append("<p>",message,"<p>");
+        };
+
+        connection.on("ReceiveMessage", function (message, userURL, userName) {
+
+            WriteToPage(message,userURL,userName);
+            //alert("hi");
+        });
+
+        $("#ButtonAddComment").click(function () {
+            //WriteToPage($("#CommentEdit").val(),"user");
+            connection.invoke("AddComment", $("#CommentEdit").val(), "/home/ShowUserInformation?UserId=@ViewBag.UserId", "@ViewBag.InstructionId", "@ViewBag.UserName" );
+        });
+</script>
+
+@*@Html.Partial("ShowComments", new List<Comment> { ViewBag.Comments } )*@

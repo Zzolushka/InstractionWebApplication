@@ -12,17 +12,24 @@ namespace InstructionsWebApplication.Models
         [Key]
         public string InstructionId { get; set; }
 
+        public string Name { get; set; }
+
         public string Description { get; set; }
 
         public string ImageURL { get; set; }
 
+        public string Category { get; set; }
+
         public string Tags { get; set; }
+
+        public string UpdateTime { get; set; }
 
         [ForeignKey("UserId")]
         public virtual ApplicationUser User { get; set; }
 
         public virtual ICollection<Page> Pages { get; set; }
 
-        
+        public virtual ICollection<Comment> Comments { get; set; }
+
     }
 }

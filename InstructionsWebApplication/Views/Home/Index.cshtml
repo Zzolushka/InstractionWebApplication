@@ -1,5 +1,68 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model InstructionsWebApplication.Models.HomeViewModels.IndexViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = "ShowAllInstruction";
 }
 
-@Html.ActionLink("AddInstruction","Create","Instruction");
+<form method="post">
+    <div class="jumbotron form-group">
+        <h1 class="text-center">@Localizer["HomePage"]</h1>
+        <p>
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+                <input asp-for="@Model.Text"  class="form-group form-control" id="textSearchInput" placeholder="@Localizer["SearchText"]">
+                <span class="input-group-btn">
+                    <input class="btn btn-success" type="submit" value="@Localizer["Search"]"/>
+                </span>
+            </div>
+        </p>
+    </div>
+</form>
+    @*<form method="post">
+        <div class="row form-group">
+            <div class="col-md-7">
+                <input asp-for="@Model.Text" class="form-group " id="textSearchInput" placeholder="Enter text to search" />
+            </div>
+            <div class="col-md-5">
+                <button class="btn btn-success">Search</button>
+            </div>
+        </div>
+    </form>*@
+
+
+
+    @foreach (var item in Model.Instructions)
+    {
+
+        <div class="row">
+            <div class="col-sm-12 col-md-12 ">
+                <div class="thumbnail">
+                    <h3 class="text-center">@item.Name</h3>
+                    <img src="@item.ImageURL" alt="...">
+                    <div class="caption">
+                        <div class="well well-lg">
+                            <p class="lead tex">
+                                @item.Description
+                               
+                            </p>
+                        </div>
+                        <p>
+                            @Html.ActionLink(@Localizer["Open"].Value, "ShowInstruction", "Instruction", new { InstructionId = item.InstructionId }, new { @class = "btn btn-success btn-block", role = "button" })
+                        </p>
+
+                        <p>
+                            <span class="label label-default">@item.Category</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+
+
+
+
+

@@ -1,0 +1,47 @@
+﻿@model IEnumerable<InstructionsWebApplication.Models.Instruction>
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = "ShowAllInstruction";
+}
+
+<div class="jumbotron">
+    <h1 class="text-center">@ViewBag.UserName</h1>
+    <p>
+    <div>
+        @Html.ActionLink(Localizer["Add"].Value, "Create", "Instruction", new {UserId = ViewBag.UserId }, new { @class = "btn btn-success btn-block" })
+    </div>
+        </p>
+
+</div>
+   
+    @foreach (var item in Model)
+    {   <div class="row">
+            <div class="col-sm-12 col-md-12">
+                <div class="thumbnail">
+                    <h3 class="text-center">@item.Name</h3>
+                    <img src="@item.ImageURL" alt="...">
+                    <div class="caption">
+
+                        <div class="well ">
+                            <p>@item.Description</p>
+                        </div>
+                        <p>
+
+                            <div class="btn-group btn-group-justified">
+                            @Html.ActionLink(Localizer["Edit"].Value, "Edit", "Instruction", new { InstructionId = item.InstructionId }, new { @class = "btn btn-primary" })
+                            @Html.ActionLink(Localizer["Delete"].Value, "Delete", "Instruction", new { UserId = ViewBag.UserId,InstructionId = item.InstructionId }, new { @class = "btn btn-danger", role = "button" })
+                            @Html.ActionLink(Localizer["Open"].Value, "ShowInstruction", "Instruction", new { InstructionId = item.InstructionId }, new { @class = "btn btn-success", role = "button" })
+                            </div>
+                          
+                        </p>
+                        <p>
+                        <span class="label label-default">@item.Category</span>
+                            </p>
+                </div>
+                </div>
+            </div>
+        </div>
+    }
+
